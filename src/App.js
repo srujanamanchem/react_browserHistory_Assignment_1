@@ -109,19 +109,30 @@ const Application = props => {
 }
 
 class App extends Component {
-  state = {searchValue: ''}
+  state = {searchValue: '', historyList: initialHistoryList}
 
   changeSearchInput = event => this.setState({searchValue: event.target.value})
 
-  deleteApplication = id => {
-    initialHistoryList.filter(eachApp => eachApp.id !== id)
+  deleteApplication = itemId => {
+    const {historyList} = this.state
+
+    const updatedHistoryList = historyList.filter(
+      eachApp => eachApp.id !== itemId,
+    )
+
+    this.setState({
+      historyList: updatedHistoryList,
+    })
   }
 
   render() {
-    const {searchValue} = this.state
-    const searchResults = initialHistoryList.filter(eachApplication =>
+    const {searchValue, historyList} = this.state
+
+    const searchResults = historyList.filter(eachApplication =>
       eachApplication.title.toLowerCase().includes(searchValue.toLowerCase()),
     )
+
+    const itemsListLength = searchResults.length
 
     return (
       <div className="history-app">
@@ -149,13 +160,15 @@ class App extends Component {
         </div>
         <div className="applications">
           <ul className="applications-list">
-            {searchResults.map(eachApp => (
-              <Application
-                appDetails={eachApp}
-                key={eachApp.id}
-                deleteApp={this.deleteApplication}
-              />
-            ))}
+            {itemsListLength &&
+              searchResults.map(eachApp => (
+                <Application
+                  appDetails={eachApp}
+                  key={eachApp.id}
+                  deleteApp={this.deleteApplication}
+                />
+              ))}
+            {!itemsListLength && <p>There is no history to show</p>}
           </ul>
         </div>
       </div>
