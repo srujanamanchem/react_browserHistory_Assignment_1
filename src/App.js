@@ -79,9 +79,12 @@ const initialHistoryList = [
 ]
 
 const Application = props => {
-  const {appDetails, deleteApplication} = props
+  const {appDetails, deletingApplication} = props
   const {id, timeAccessed, logoUrl, title, domainUrl} = appDetails
-  const deleteApp = () => deleteApplication(id)
+  const deletingApp = () => {
+    deletingApplication(id)
+  }
+
   return (
     <li className="application">
       <p className="time">{timeAccessed}</p>
@@ -92,10 +95,10 @@ const Application = props => {
           <p className="domain">{domainUrl}</p>
         </div>
         <button
-          type="button"
           testid="delete"
+          type="button"
           className="delete-button"
-          onClick={deleteApp}
+          onClick={deletingApp}
         >
           <img
             src="https://assets.ccbp.in/frontend/react-js/delete-img.png"
@@ -113,27 +116,41 @@ class App extends Component {
 
   changeSearchInput = event => this.setState({searchValue: event.target.value})
 
-  deleteApplication = itemId => {
-    const {historyList} = this.state
-
-    const updatedHistoryList = historyList.filter(
-      eachApp => eachApp.id !== itemId,
-    )
-
-    this.setState({
-      historyList: updatedHistoryList,
-    })
+  deletingApplication = itemId => {
+    this.setState(prevState => ({
+      historyList: prevState.historyList.filter(each => each.id !== itemId),
+    }))
   }
 
-  render() {
+  renderApplicationsList = () => {
     const {searchValue, historyList} = this.state
 
     const searchResults = historyList.filter(eachApplication =>
       eachApplication.title.toLowerCase().includes(searchValue.toLowerCase()),
     )
-
     const itemsListLength = searchResults.length
 
+    if (itemsListLength > 0) {
+      return (
+        <ul className="applications-list">
+          {searchResults.map(eachApp => (
+            <Application
+              appDetails={eachApp}
+              key={eachApp.id}
+              deleteApp={this.deletingApplication}
+            />
+          ))}
+        </ul>
+      )
+    }
+    return (
+      <div className="nothing-text-container">
+        <p className="nothing-text">There is no history to show</p>
+      </div>
+    )
+  }
+
+  render() {
     return (
       <div className="history-app">
         <div className="history-title">
@@ -158,19 +175,7 @@ class App extends Component {
             />
           </div>
         </div>
-        <div className="applications">
-          <ul className="applications-list">
-            {itemsListLength &&
-              searchResults.map(eachApp => (
-                <Application
-                  appDetails={eachApp}
-                  key={eachApp.id}
-                  deleteApp={this.deleteApplication}
-                />
-              ))}
-            {!itemsListLength && <p>There is no history to show</p>}
-          </ul>
-        </div>
+        <div className="applications">{this.renderApplicationsList()}</div>
       </div>
     )
   }
