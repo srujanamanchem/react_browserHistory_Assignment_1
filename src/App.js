@@ -79,10 +79,10 @@ const initialHistoryList = [
 ]
 
 const Application = props => {
-  const {appDetails, deletingApplication} = props
+  const {appDetails, deleteApp} = props
   const {id, timeAccessed, logoUrl, title, domainUrl} = appDetails
   const deletingApp = () => {
-    deletingApplication(id)
+    deleteApp(id)
   }
 
   return (
